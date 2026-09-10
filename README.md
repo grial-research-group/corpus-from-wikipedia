@@ -20,7 +20,9 @@ First, try typing in your terminal the command, using the help flag, to ensure i
 $ cfw -h
 usage: cfw [-h] {create,segment,align,rescore,select,pipeline,database} ...
 
-Tool to create specialized monolingual and parallel corpora from Wikipedia. It supports step-by-step execution and full pipeline execution. That is, commands may be run individually, e.g., in order to inspect results between steps, or execute the entire workflow at once using the 'pipeline' command.
+Tool to create specialized monolingual and parallel corpora from Wikipedia. It supports step-by-step 
+execution and full pipeline execution. That is, commands may be run individually, e.g., in order to 
+inspect results between steps, or execute the entire workflow at once using the 'pipeline' command.
 
 positional arguments:
   {create,segment,align,rescore,select,pipeline,database}
