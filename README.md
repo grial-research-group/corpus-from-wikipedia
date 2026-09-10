@@ -18,18 +18,19 @@ First, try typing in your terminal the command, using the help flag, to ensure i
 
 ```console
 $ cfw -h
-usage: cfw [-h] {create,segment,align,rescore,select,pipeline} ...
+usage: cfw [-h] {create,segment,align,rescore,select,pipeline,database} ...
 
-Tool that allows the creation, segmentation, alignment, rescoring and segment selection of parallel corpora from Wikipedia. It supports step-by-step execution and full pipeline execution. That is, commands may be run individually, e.g., in order to inspect results between steps, or execute the entire workflow at once using the 'pipeline' command.
+Tool to create specialized monolingual and parallel corpora from Wikipedia. It supports step-by-step execution and full pipeline execution. That is, commands may be run individually, e.g., in order to inspect results between steps, or execute the entire workflow at once using the 'pipeline' command.
 
 positional arguments:
-  {create,segment,align,rescore,select,pipeline}
+  {create,segment,align,rescore,select,pipeline,database}
     create              Create a corpus from Wikipedia.
     segment             Segment the extracted corpus.
     align               Perform bitext mining and alignment between two corpora.
     rescore             Rescore the alignment using more computationally expensive models.
     select              Filter the rescored parallel segments.
     pipeline            Execute the whole pipeline: create > segment > align > rescore > select
+    database            Generate a categories database.
 
 options:
   -h, --help            show this help message and exit
