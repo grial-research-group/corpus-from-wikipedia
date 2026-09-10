@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "corpusFromWikipedia"
+version = "1.0.0"
+description = "Tool to create corpora from Wikipedia dumps"
+requires-python = ">= 3.10"
+dependencies = [
+    "faiss-gpu",
+    "scikit-learn",
+    "fasttext",
+    "numpy==1.26.4",
+    "charset-normalizer",
+    "lxml",
+    "pycountry",
+    "sentence-transformers",
+    "mwxml",
+    "mwparserfromhell",
+    "stanza",
+    "scipy==1.12.0"
+]
+
+[project.scripts]
+corpus-from-wikipedia = "cfw.cli:cli"
+cfw = "cfw.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
