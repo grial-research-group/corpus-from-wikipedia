@@ -1,2 +1,2 @@
 # corpus-from-wikipedia
-CLI tool for creating parallel corpora from Wikipedia dumps.
+CLI tool for creating monolingual and parallel corpora from Wikipedia dumps.
