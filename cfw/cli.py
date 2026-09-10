@@ -29,7 +29,7 @@ def cli():
     parser = argparse.ArgumentParser(
         description=
         '''
-        Tool that allows the creation, segmentation, alignment, rescoring and segment selection of parallel corpora from Wikipedia. It supports step-by-step execution and full pipeline execution. That is, commands may be run individually, e.g., in order to inspect results between steps, or execute the entire workflow at once using the 'pipeline' command.
+        Tool to create specialized monolingual and parallel corpora from Wikipedia. It supports step-by-step execution and full pipeline execution. That is, commands may be run individually, e.g., in order to inspect results between steps, or execute the entire workflow at once using the 'pipeline' command.
         '''
         )
     subparsers = parser.add_subparsers(required=True)
