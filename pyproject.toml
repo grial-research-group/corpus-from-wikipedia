@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "corpusFromWikipedia"
+name = "corpus-from-wikipedia"
 version = "1.0.0"
 description = "Tool to create corpora from Wikipedia dumps"
 requires-python = ">= 3.10"
