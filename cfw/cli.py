@@ -48,7 +48,7 @@ def cli():
     create_parser.set_defaults(func=create_corpora)
 
 # SEGMENT SUBPARSER
-    segment_parser = subparsers.add_parser("segment", help="Segment the extracted corpus.", description="Segment all text files in a folder. The folder name must contain a language code at the end separated by a hyphen from the rest. If you have created a corpus using the 'create' command, this folder is named 'pages-en'. The output is a 'segments' folder and a 'unique-segments' text file with the language ISO code at the end.")
+    segment_parser = subparsers.add_parser("segment", help="Segment the extracted corpus.", description="Segment all text files in a pages folder. The folder name must contain a language code at the end separated by a hyphen from the rest. If you have created a corpus using the 'create' command, this folder is named 'pages-en'. The output is a 'segments' folder and a 'unique-segments' text file with the language ISO code at the end.")
     segment_parser.add_argument("indir", help="Folder where the corpus to segment is stored, e.g., 'pages-en'. The name must contain a hyphen and a language code at the end.")
     segment_parser.add_argument("--srxfile", type=str, help="The SRX file to use. Default: segment.srx", required=False)
     segment_parser.add_argument("--force-srx-lang", help="Override the default SRX language configuration if your language is not available in the file. You may use one of the following: Default, Generic, ByLineBreak or ByTwoLineBreaks.", required=False)
@@ -58,7 +58,7 @@ def cli():
     segment_parser.set_defaults(func=segment_corpus)
 
 # ALIGN SUBPARSER
-    align_parser = subparsers.add_parser("align", help="Perform bitext mining and alignment between two corpora.", description="Bitext mine and align parallel sentences from two lists of monolingual sentences. The input directory can be a folder where both corpora are located, e.g. corpus-ca-en/ if your aim is to create a parallel corpus, or two different folders (e.g. corpus-en/ corpus-ca/). The tool automatically looks for the unique segments files in both languages. The output is an aligned segments text file.")
+    align_parser = subparsers.add_parser("align", help="Perform bitext mining and alignment between two corpora.", description="Bitext mine and align sentences from two lists of monolingual sentences. The input directory can be a folder where both corpora are located, e.g. corpus-ca-en/, or two monolingual corpora located in different folders (e.g. corpus-en/ corpus-ca/). The tool automatically looks for the unique segments files in both languages. The output is an aligned segments text file.")
     align_parser.add_argument("indir", help="Path to the folder that contains the unique segments files (e.g. corpus-en-ca/).")
     align_parser.add_argument("optional_indir", nargs='?', help="Use this argument too if you are aligning two monolingual corpora, that is, they are located in separate folders (e.g. monolingual/corpus-en/ monolingual/corpus-ca/).", default=None)
     align_parser.add_argument("-dev", "--device", choices=["gpu", "cpu"], default="gpu", dest="device", help="Device used (GPU or CPU). Default: GPU.", required=False)
@@ -134,9 +134,9 @@ def cli():
     pipeline_parser.set_defaults(func=pipeline)
 
 # DATABASE SUBPARSER
-    database_parser = subparsers.add_parser("database", help="Generate a categories database.", description="Generate a categories database to be used by the 'create' command.")
-    database_parser.add_argument("--skoscategories", help="The skos_categories_CODE.ttl.bz2 file. Can be downloaded from https://downloads.dbpedia.org/", required=True, dest="skos")
-    database_parser.add_argument("--langlinks", help="The CODE-langlinks.sql.gz file. Can be downloaded from https://dumps.wikimedia.org/backup-index.html", required=True, dest="lang_links")
+    database_parser = subparsers.add_parser("database", help="Generate a categories database.", description="Generate a categories database to for corpus creation.")
+    database_parser.add_argument("--skoscategories", help="Path to the skos_categories_CODE.ttl.bz2 file. Can be downloaded from https://downloads.dbpedia.org/", required=True, dest="skos")
+    database_parser.add_argument("--langlinks", help="Path to the CODE-langlinks.sql.gz file. Can be downloaded from https://dumps.wikimedia.org/backup-index.html", required=True, dest="lang_links")
     database_parser.add_argument("--dump", help="The path to the dump to be used.", required=True, dest="dump")
     database_parser.add_argument("--outdir", type=str, help="Output directory where to save the generated database. Default is in the tool's folder.")
     database_parser.set_defaults(func=generate_database)
