@@ -332,21 +332,6 @@ def create_corpora(args):
                                 print("ERROR:",sys.exc_info())
                                 print(f"Category namespace for {lang_name} might be missing.")
 
-            # fix of the previous check
             if total >= len(usertitles_set):
                 print(f"\nAll articles ({total}) in {lang_name} processed!")
                 processed_articles_path.unlink()
-                print("-" * 60)
-                print(f"\nPages saved: {len(processed_articles_set)}")
-                print(f"Pages skipped (redirects): {len(redirect_titles)}")
-
-            else: # bug check
-                print(f"\nOnly found {total}/{len(usertitles_set)} articles.")
-                
-                # missing_titles = usertitles_set - processed_articles_set - redirect_titles
-                # print(f"\nCould not find {len(missing_titles)} titles in the dump")
-                
-                # for title in list(missing_titles)[:20]:
-                #     print(f"{title}"
-            
-            print("-" * 60)

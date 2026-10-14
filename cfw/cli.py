@@ -103,7 +103,7 @@ def cli():
     create_group.add_argument('-c', '--categories', action="store", help='Wikipedia categories to search. Must be in between quotation marks ("") and separated by a comma (,). If no categories are passed, the whole dump will be processed.', required=False)
     create_group.add_argument('-d', '--depth', type=int, help='Recursion depth for traversing the category tree.', required=False)
     create_group.add_argument('--restrict', action='store_true', help='Restrict L2 pages to equivalent L1 pages.', required=False)
-    create_group.add_argument("--database", help='The CCW sqlite database to use. Default: database/CCWikipedia-20251201.sqlite', required=False)
+    create_group.add_argument("--database", help='The CCW SQLite database to use. By default it uses the one that is in the database/ folder.', required=False)
     create_group.add_argument('--dumps', help='Wikipedia dumps path. Default: dumps/',required=False)
 
     # SEGMENT OPTIONS

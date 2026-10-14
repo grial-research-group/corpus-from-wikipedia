@@ -96,32 +96,25 @@ def generate_database(args):
 
 
         #LANGLINKS 
-        # bug en cómo se forman los títulos
-
         f=gzip.open(langlinkssqlgz,'rb')
 
-        expreg=r"\([0-9]+,'.+?','.+?'\)"
-
-        titles={}
-        langlinks={}
         cont=0
         for line in f:
+
             l=line.decode("utf-8",errors="replace")
-            ll=re.findall(r'\(.+?\)',l)
-            for tripleta in ll:
-                tripleta=tripleta.replace("(","").replace(")","")
-                camps=tripleta.split(",")
-                if len(camps)>2:
-                    id=camps[0]
-                    lang=camps[1][1:-1]
-                    title=camps[2][1:-1] # here
-                    data=[id,title,lang]
-                    cont+=1
-                    cur.execute("INSERT OR IGNORE INTO langlinks (ident,title,lang) VALUES (?,?,?)",data)
-                    if cont==100000:
-                        conn.commit()
-                        cont=0
-                        print("Commit langlinks")
+            tuple = re.findall(r"\((\d+),'(.+)','(.+)'\)", l)
+
+            for id, lang, title in tuple:
+                title = title.replace("\\'", "'")
+
+                data = [id, title, lang]
+
+                cont+=1
+                cur.execute("INSERT OR IGNORE INTO langlinks (ident,title,lang) VALUES (?,?,?)",data)
+                if cont==100000:
+                    conn.commit()
+                    cont=0
+                    print("Commit langlinks")
                             
         print("Finished langlinks")
                     
