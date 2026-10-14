@@ -12,7 +12,7 @@ This CLI unifies several previously standalone scripts into a single tool, while
 `pip install -e .`
 3. The tool is now installed and can be used in your terminal with the commands `corpus-from-wikipedia` or simply `cfw`.
 
-For the tool to work, you need a **Wikipedia dump** and a **categories database**. The **dumps** can be downloaded from [here](https://dumps.wikimedia.org/backup-index-bydb.html). The name of the **dumps** is the two letter ISO language code followed by 'wiki', e.g., *cawiki* for the Catalan Wikipedia. Once found, you need to download the file '*pages-articles.xml.bz2*'. We provide a recent **database** in [this](https://huggingface.co/datasets/gon-zalo/cfw-database/tree/main) link, but a new one can be generated with the command `database`. Both these files need to be placed in the `dumps` and `database` folders respectivelly. 
+For the tool to work, you need **Wikipedia dumps** and a **categories database**. The **dumps** can be downloaded from [here](https://dumps.wikimedia.org/backup-index-bydb.html). The name of the **dumps** is the two letter ISO language code followed by 'wiki', e.g., *cawiki* for the Catalan Wikipedia. Once found, you need to download the file '*pages-articles.xml.bz2*'. We provide a recent **database** in Hugging Face [here](https://huggingface.co/datasets/gon-zalo/cfw-database), but a new one can be generated with the command `database`. These files need to be placed in the `dumps` and `database` folders respectivelly. 
 
 
 ## Getting started
@@ -45,7 +45,7 @@ The tool consists mainly of six subcommands: `create`, `segment`, `align`, `resc
 
 You can run each command with the help flag (`-h`) to see in detail the functionalities of each command and its parameters.
 
-The `create` command will create a folder named `corpus` by default, followed by the source language ISO code and the target language ISO code, e.g. `corpus-ca-en`. It is recommended to keep all files of the subsequent commands in the same folder, although the output path can be changed.
+All created corpora are saved in a folder named `wikipedia-corpora` inside the tool's folder. The `create` command will create a folder inside this one named `corpus` by default, followed by the source language ISO code and the target language ISO code, e.g. `corpus-ca-en`. It is recommended to keep all files of the subsequent commands in the same folder, although the output path can be changed.
 
 ### Create
 
@@ -170,9 +170,9 @@ Example:
 
 Generate a categories SQLite database. Based on https://github.com/mtuoc/MTUOC-corpusFromWikipedia. The `database` command contains the following parameters:
 
--  `--skoscategories`: The skos_categories_CODE.ttl.bz2 file. Can be downloaded from https://downloads.dbpedia.org/
--  `--langlinks`: The CODE-langlinks.sql.gz file. Can be downloaded from https://dumps.wikimedia.org/backup-index.html
--  `--dump`: The path to the dump to be used. Can be downloaded from https://dumps.wikimedia.org/backup-index.html.
+-  `--skoscategories`: The skos_categories_*CODE*.ttl.bz2 file (e.g. `skos_categories_en.ttl`). Can be downloaded from https://downloads.dbpedia.org/
+-  `--langlinks`: The *CODE*wiki-*DATE*-langlinks.sql.gz file (e.g. `enwiki-20261001-langlinks.sql.gz`). Can be downloaded from https://dumps.wikimedia.org/backup-index.html
+-  `--dump`: The path to the dump to be used, that is the *pages-articles.xml.bz2* file (e.g. `enwiki-20261001-pages-articles.xml.bz2`). Can be downloaded from https://dumps.wikimedia.org/backup-index.html.
 -  `--outdir`: Output directory where to save the generated database. Default is in the tool's folder.
 
 See [How to install the tool](#how-to-install-the-tool) for more information.
