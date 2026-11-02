@@ -51,15 +51,13 @@ All created corpora are saved in a folder named `wikipedia-corpora` inside the t
 
 Creates a corpus from Wikipedia dumps. Based on https://github.com/mtuoc/MTUOC-corpusFromWikipedia. The `create` command contains the following parameters:
 
-- `lang1`                 Name or ISO code of the source language.
-- `lang2`                 Name or ISO code of the target language. Keep empty to create a monolingual corpus.
+- `lang1`: Name or ISO code of the source language.
+- `lang2`: Name or ISO code of the target language. Keep empty to create a monolingual corpus.
 
 Optional:
--  `-c`, `--categories`: 
-                        Wikipedia categories to search. Must be in between quotation marks ("") and separated by a
+-  `-c`, `--categories`: Wikipedia categories to search. Must be in between quotation marks ("") and separated by a
                         comma (,). Category names can be looked up [here](https://en.wikipedia.org/wiki/Wikipedia:Contents/Categories) in advance. If this parameter is not used, the whole dump will be extracted.
--  `-d`, `--depth`: 
-                        Recursion depth for traversing the category tree.
+-  `-d`, `--depth`: Recursion depth for traversing the category tree.
 -  `--restrict`:            Restrict L2 pages to equivalent L1 pages.
 - `--database`:   The directory where the CCW SQLite database is. Default: database/
 - `--dumps`:         Wikipedia dumps path. Default: dumps/
@@ -142,7 +140,7 @@ Example:
 
 Filters the rescored segments based on the defined quality thresholds. Based on https://github.com/mtuoc/MTUOC-PCorpus-rescorer. The `select` command contains the following parameters:
 
--  `indir`                 Path to the folder that contains a rescored segments file. This file is meant to be
+-  `indir`: Path to the folder that contains a rescored segments file. This file is meant to be
                         the resulting one from the rescore function
 
 `Optional`:
