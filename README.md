@@ -12,7 +12,7 @@ This CLI unifies several previously standalone scripts into a single tool, while
 `pip install -e .`
 3. The tool is now installed and can be used in your terminal with the commands `corpus-from-wikipedia` or simply `cfw`.
 
-For the tool to work, you need **Wikipedia dumps** and a **categories database**. The **dumps** can be downloaded from [here](https://dumps.wikimedia.org/backup-index-bydb.html). The name of the **dumps** is the two letter ISO language code followed by 'wiki', e.g., *cawiki* for the Catalan Wikipedia. Once found, you need to download the file '*pages-articles.xml.bz2*'. We provide a recent **database** in Hugging Face [here](https://huggingface.co/datasets/gon-zalo/cfw-database), but a new one can be generated with the command `database`. These files need to be placed in the `dumps` and `database` folders respectivelly. 
+For the tool to work, you need **Wikipedia dumps** and a **categories database**. The **dumps** can be downloaded from [here](https://dumps.wikimedia.org/backup-index-bydb.html). The name of the **dumps** is the two letter ISO language code followed by *wiki*, e.g., *cawiki* for the Catalan Wikipedia. Once found, you need to download the file *pages-articles.xml.bz2*. As for the **database**, we provide a recent one (1/10/2026) [here](https://huggingface.co/datasets/gon-zalo/cfw-database), based on the English Wikipedia, but a new one (also based on another language) can be generated with the command `database`. These files need to be placed in the `dumps` and `database` folders respectivelly. 
 
 
 ## Getting started
@@ -51,19 +51,17 @@ All created corpora are saved in a folder named `wikipedia-corpora` inside the t
 
 Creates a corpus from Wikipedia dumps. Based on https://github.com/mtuoc/MTUOC-corpusFromWikipedia. The `create` command contains the following parameters:
 
-- `lang1`                 Name or ISO code of the source language.
-- `lang2`                 Name or ISO code of the target language. Keep empty to create a monolingual corpus.
+- `lang1`: Name or ISO code of the source language.
+- `lang2`: Name or ISO code of the target language. Keep empty to create a monolingual corpus.
 
 Optional:
--  `-c` or `--categories`: 
-                        Wikipedia categories to search. Must be in between quotation marks ("") and separated by a
-                        comma (,). Category names can be looked up [here](https://en.wikipedia.org/wiki/Wikipedia:Contents/Categories) in advance.
--  `-d` DEPTH, `--depth`: 
-                        Recursion depth for traversing the category tree.
+-  `-c`, `--categories`: Wikipedia categories to search. Must be in between quotation marks ("") and separated by a
+                        comma (,). Category names can be looked up [here](https://en.wikipedia.org/wiki/Wikipedia:Contents/Categories) in advance. If this parameter is not used, the whole dump will be extracted.
+-  `-d`, `--depth`: Recursion depth for traversing the category tree.
 -  `--restrict`:            Restrict L2 pages to equivalent L1 pages.
 - `--database`:   The directory where the CCW SQLite database is. Default: database/
 - `--dumps`:         Wikipedia dumps path. Default: dumps/
-- `--outdir`:        Name of the output directory. Default: corpora-lang1-lang2/. Language codes will be added
+- `--outdir`:        Name of the output directory. Default: wikipedia-corpora-lang1-lang2/. Language codes will be added
                         automatically.
 - `--continue`:            Continue a previously interrupted corpora creation process. A 'processed-articles-lang.temp'
                         file should exist in the corpus directory.
@@ -97,16 +95,16 @@ Optional:
 
 Example:
 
-`cfw segment corpora/parallel/marine-ca-en/pages-ca/ --chunk`
+`cfw segment wikipedia-corpora/parallel/marine-ca-en/pages-ca/ --chunk`
 
 ### Align
 Bitext mines and aligns parallel sentences from two lists of monolingual sentences. Based on https://github.com/mtuoc/MTUOC-aligner. The `align` command contains the following parameters:
 
--  `indir`                 Path to the folder that contains the unique segments files (e.g. corpus-
-                        en-ca/).
--  `optional_indir`        Use this argument too if you are aligning two monolingual corpora, that
-                        is, they are located in separate folders (e.g. monolingual/corpus-en/
-                        monolingual/corpus-ca/).
+-  `indir`: Path to the folder that contains the unique segments files (e.g. corpus-
+            en-ca/).
+-  `optional_indir`: Use this argument too if you are aligning two monolingual corpora, that
+                      is, they are located in separate folders (e.g. monolingual/corpus-en/
+                      monolingual/corpus-ca/).
 
 Optional:  
 -  `-dev`, `--device`: Device used (GPU or CPU). Default: GPU.
@@ -119,14 +117,14 @@ Optional:
 
 Example:
 
-`cfw align corpora/parallel/marine-ca-en/ --mode fast`
+`cfw align wikipedia-corpora/parallel/marine-ca-en/ --mode fast`
 
 ### Rescore
 
 Rescores previously aligned corpora. Based on https://github.com/mtuoc/MTUOC-PCorpus-rescorer. The aligned segments are evaluated using more computationally expensive models. The `rescore` command contains the following parameters:
 
 
--  indir              Path to the folder that contains an aligned segments file.
+-  `indir`: Path to the folder that contains an aligned segments file.
 
 Optional:
 -  `--SEmodel`: Sentence Transformers embeddings model. Default model: `LaBSE`.
@@ -136,13 +134,13 @@ Optional:
 
 Example:
 
-`cfw rescore corpora/parallel/marine-ca-en/`
+`cfw rescore wikipedia-corpora/parallel/marine-ca-en/`
 
 ### Select
 
 Filters the rescored segments based on the defined quality thresholds. Based on https://github.com/mtuoc/MTUOC-PCorpus-rescorer. The `select` command contains the following parameters:
 
--  `indir`                 Path to the folder that contains a rescored segments file. This file is meant to be
+-  `indir`: Path to the folder that contains a rescored segments file. This file is meant to be
                         the resulting one from the rescore function
 
 `Optional`:
@@ -156,7 +154,7 @@ Filters the rescored segments based on the defined quality thresholds. Based on 
 
 Example:
 
-`cfw select corpora/parallel/marine-ca-en/ --min-chars 25`
+`cfw select wikipedia-corpora/parallel/marine-ca-en/ --min-chars 25`
 
 ### Pipeline
 
