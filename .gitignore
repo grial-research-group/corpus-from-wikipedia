@@ -220,3 +220,7 @@ __marimo__/
 
 cfw/utils/get_unaligned.py
 wikipedia-corpora/
+database/*
+!database/.gitkeep
+dumps/*
+!dumps/.gitkeep
