@@ -45,6 +45,7 @@ def cli():
     create_parser.add_argument('--dumps', help='Wikipedia dumps path. Default: dumps/', required=False)   
     create_parser.add_argument('--outdir', help='Name of the output directory. Default: corpora-lang1-lang2/. Language codes will be added automatically.',required=False)
     create_parser.add_argument('--continue', dest='continue_creation', help="Continue a previously interrupted corpora creation process. A 'processed-articles-lang.temp' file should exist in the corpus directory.", action='store_true', required=False)
+    create_parser.add_argument('--raw', help='Extract raw content without references, bibliography, etc.', required=False)
     create_parser.set_defaults(func=create_corpora)
 
 # SEGMENT SUBPARSER
@@ -52,7 +53,7 @@ def cli():
     segment_parser.add_argument("indir", help="Folder where the corpus to segment is stored, e.g., 'pages-en'. The name must contain a hyphen and a language code at the end.")
     segment_parser.add_argument("--srxfile", type=str, help="The SRX file to use. Default: segment.srx", required=False)
     segment_parser.add_argument("--force-srx-lang", help="Override the default SRX language configuration if your language is not available in the file. You may use one of the following: Default, Generic, ByLineBreak or ByTwoLineBreaks.", required=False)
-    segment_parser.add_argument("--force-segmenter", help="Use a Stanza sentence segmenter instead of SRX. Note that it is slower than the SRX implementation, but useful if your language is supported in this library and not in the SRX file.", required=False, action="store_true")
+    segment_parser.add_argument("--force-segmenter", help="Use yasbd or stanza to segment the corpus instead of SRX. Note that Stanza is slower, but useful if your language is only supported in this library.", required=False, choices=["yasbd", "stanza"])
     segment_parser.add_argument("--chunk", help="Compile the whole corpus in chunks before segmenting. If the corpus is made up of millions of files, the time saved is massive. Note that individual segmented articles will not be available.", action="store_true", required=False)
     segment_parser.add_argument("--outdir", type=str, help="Output directory in which to save the segmented files. If not specified, it will be saved in the same directory as the input file.", required=False)
     segment_parser.set_defaults(func=segment_corpus)
@@ -105,12 +106,13 @@ def cli():
     create_group.add_argument('--restrict', action='store_true', help='Restrict L2 pages to equivalent L1 pages.', required=False)
     create_group.add_argument("--database", help='The CCW SQLite database to use. By default it uses the one that is in the database/ folder.', required=False)
     create_group.add_argument('--dumps', help='Wikipedia dumps path. Default: dumps/',required=False)
+    create_group.add_argument('--raw', help='Extract raw content without references, bibliography, etc.', required=False)
 
     # SEGMENT OPTIONS
     segment_group = pipeline_parser.add_argument_group("Segment options")
     segment_group.add_argument("--srxfile", type=str, help="The SRX file to use. Default: segment.srx", required=False)
     segment_group.add_argument("--force-srx-lang", help="Override the default SRX language configuration if your language is not available in the file. You may use one of the following: Default, Generic, ByLineBreak or ByTwoLineBreaks. Can choose between src and tgt, e.g. 'src Default'",nargs=2, metavar=("SIDE", "LANG"), action="append", required=False)
-    segment_group.add_argument("--force-segmenter", help="Use a Stanza sentence segmenter instead of SRX. Note that it is slower than the SRX implementation, but useful if your language is supported in this library and not in the SRX file. Can choose between src and tgt.", required=False, choices=["src", "tgt"], nargs="+")
+    segment_group.add_argument("--force-segmenter", help="Use yasbd or Stanza to segment the corpus instead of SRX. Note that Stanza is slower, but useful if your language is only supported in this library.", required=False, choices=["yasbd", "stanza"])
     segment_group.add_argument("--chunk", help="Compile the whole corpus in chunks before segmenting. If the corpus is made up of millions of files, the time saved is massive. Note that individual segmented articles will not be available.", action="store_true", required=False)
 
     # ALIGN OPTIONS

@@ -15,10 +15,49 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-def extract_text_from_wikitext(wikitext):
+def extract_text_from_wikitext(wikitext, omit_sections, thumb_regex, raw=False):
     import mwparserfromhell
+    import re
+    if not wikitext:
+        return ""
+
     wikicode = mwparserfromhell.parse(wikitext)
-    return wikicode.strip_code()
+
+    # 2. Content Truncation
+    if not raw:
+        target_node = None
+        for heading in wikicode.filter_headings():
+            title_text = heading.title.strip_code().strip().lower()
+            # Check if the heading exactly matches any of our omitted sections
+            if any(omit.lower() == title_text for omit in omit_sections):
+                target_node = heading
+                break
+
+        # If a terminal section is found, slice the wikitext up to that point
+        if target_node:
+            wikicode_str = str(wikicode)
+            target_str = str(target_node)
+            pos = wikicode_str.find(target_str)
+            if pos != -1:
+                wikicode = mwparserfromhell.parse(wikicode_str[:pos])
+
+    text = wikicode.strip_code()
+
+    if thumb_regex:
+        text = thumb_regex.sub("", text)
+    
+    # Remove standalone image dimensions (e.g., "250px", "300x200px")
+    text = re.sub(r"\b\d+(?:x\d+)?px\b", "", text, flags=re.IGNORECASE)
+    
+    # Clean leading pipes and unescape isolated pipe tokens
+    text = re.sub(r"^\s*\|+\s*", "", text, flags=re.MULTILINE)
+    text = re.sub(r"\s*\|+\s*", " ", text)
+    
+    # Normalize double spaces and multiple newline sequences
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    return text.strip()
     
 def find_dump(dumps_path, lang_code, lang_name):
     import sys
@@ -78,6 +117,8 @@ def create_corpora(args):
     from tqdm import tqdm
     from ..utils.get_language import get_language
     from ..utils.category_namespaces import fetch_category_namespaces
+    from ..utils.omit_thumbnail import get_thumbnail_keywords
+    from ..utils.omit_sections import get_omit_sections
     print("\nRunning create command")
 
     category_namespaces = fetch_category_namespaces()
@@ -93,6 +134,7 @@ def create_corpora(args):
     
     continue_creation = args.continue_creation
     outdir = args.outdir if args.outdir else None
+    raw = args.raw
 
     if lang2: # if bilingual
         print("Creating bilingual corpus\n")
@@ -180,7 +222,7 @@ def create_corpora(args):
         
         article_list="articlelist-"+lang_code+".txt"
         article_list_path = os.path.join(outdir, article_list)
-        article_list_file = open(article_list_path,"w",encoding="utf-8")
+        article_list_file = open(article_list_path,"w+",encoding="utf-8")
         
         if contlang==2 and restrict:
             selectcategories=False
@@ -235,12 +277,33 @@ def create_corpora(args):
                     if contlang==1: restrictedIdentsKeys.append(ident)
                     todownload.append(data[0])
                     article_list_file.write(data[0]+"\n")
-        article_list_file.close() 
-    
+
+        # articles = sorted(article_list_file.readlines())
+        # print(articles)
+        # article_list_file.close() 
+
+        # with open(article_list_path, "w", encoding="utf-8") as f:
+        #     for article in articles:
+        #         f.write(article)
+
     contlang=0
     for lang in langs:
 
         lang_name, lang_code = get_language(lang)
+
+        all_thumbnail_keywords = get_thumbnail_keywords()
+        all_omit_sections = get_omit_sections()
+
+        omit_sections = all_omit_sections.get(lang_code, [])
+        thumbnail_keywords = all_thumbnail_keywords.get(lang_code, [])
+
+        if thumbnail_keywords:
+            thumb_pattern = r"\b(?:" + "|".join(re.escape(kw) for kw in thumbnail_keywords) + r")\s*\|"
+            thumb_regex = re.compile(thumb_pattern, re.IGNORECASE)
+        else:
+            thumb_pattern = r"\b(?:" + "|".join(re.escape(kw) for kw in all_thumbnail_keywords.get("en", [])) + r")\s*\|"
+            thumb_regex = re.compile(thumb_pattern, re.IGNORECASE)
+            omit_sections = all_omit_sections.get("en", [])
 
         contlang+=1
         article_list="articlelist-"+lang_code+".txt"
@@ -287,8 +350,8 @@ def create_corpora(args):
         with bz2.open(dump_path, 'rb') as f:
 
             dump = mwxml.Dump.from_file(f)
+            pbar = tqdm(dump)
 
-            pbar = tqdm(dump, total=len(usertitles_set))
             for page in pbar:
                 if page.redirect: # skip redirects
                     if page.title in usertitles_set:
@@ -303,7 +366,7 @@ def create_corpora(args):
                         pbar.set_description(f"({total}/{len(usertitles_set)}) Processing article {page.title}")
 
                         for revision in page:
-                            text = extract_text_from_wikitext(revision.text)
+                            text = extract_text_from_wikitext(revision.text, omit_sections, thumb_regex, raw=raw)
 
                             clean_title = re.sub(r'[/\\:*?"<>|]', '_', page.title) # handle unwanted symbols that mess with the path, specially /
                             filename = clean_title.replace(" ", "_") + ".txt"  
@@ -317,7 +380,12 @@ def create_corpora(args):
                                     linia=linia.strip()
                                     
                                     if not linia.startswith(category_namespaces[lang_code]) and not linia.startswith("|") and not linia.startswith("<") and not linia.startswith("!") and not linia.startswith("{")and len(linia)>0:
+
+
+                                        # if linia:
                                         sortida.write(linia+"\n")
+
+
                                 sortida.close()
 
                                 processed_articles_set.add(page.title)

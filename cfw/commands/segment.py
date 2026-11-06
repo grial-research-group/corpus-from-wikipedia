@@ -18,7 +18,6 @@
 from typing import (List, Set, Tuple, Dict, Optional)
 from ..utils.get_language import get_language
 from pathlib import Path
-import sys
 from tqdm import tqdm
 
 class SrxSegmenter:
@@ -144,7 +143,7 @@ def sort_uniq_shuf(segments_folder, lang_code, outdir):
     import subprocess
     print("Deduplicating segments")
 
-    cmd = f'find {segments_folder} -type f -print0 | xargs -0 cat | sort | uniq | shuf > {outdir}/unique-segments-{lang_code.lower()}.txt'
+    cmd = f'find {segments_folder} -type f -print0 | xargs -0 cat | sort | uniq | shuf > {outdir}/segments-{lang_code.lower()}.txt'
 
     subprocess.run(
         cmd,
@@ -153,7 +152,7 @@ def sort_uniq_shuf(segments_folder, lang_code, outdir):
     )
     print(f"Unique segments file saved in {outdir}")
 
-def load_external_segmenter(lang_name, lang_code, external_segmenter="stanza"): 
+def load_stanza_segmenter(lang_name, lang_code, external_segmenter="stanza"): 
     # implement spacy in the future?
     # if external_segmenter.lower() == 'stanza':
     import stanza
@@ -236,14 +235,15 @@ def segment_corpus(args):
     # accessing args
     tool_folder = Path(__file__).parent.parent.parent
 
-    if args.srxfile:
-        srxfile = args.srxfile
-    else:
-        srxfile = tool_folder / "segment.srx"
-        print(f"SRX file found")
-
-    rules = parse(srxfile)
-    languages = list(rules.keys())
+    if not args.force_segmenter:
+        if args.srxfile:
+            srxfile = args.srxfile
+        else:
+            srxfile = tool_folder / "segment.srx"
+            print(f"SRX file found")
+            rules = parse(srxfile)
+            languages = list(rules.keys())
+            
     force_srx_lang = args.force_srx_lang
     force_segmenter = args.force_segmenter
     chunk = args.chunk
@@ -272,10 +272,21 @@ def segment_corpus(args):
                 print("Available languages:",", ".join(languages))
                 sys.exit()
 
-        if force_segmenter: # basically if else, using stanza
-            force_segmenter_name = "stanza"
-            srxlang_name, srxlang_code = get_language(ending)
-            nlp = load_external_segmenter(srxlang_name, srxlang_code, force_segmenter_name.lower())
+        if force_segmenter:
+            if force_segmenter == "stanza":
+                srxlang_name, srxlang_code = get_language(ending)
+                nlp = load_stanza_segmenter(srxlang_name, srxlang_code, force_segmenter.lower())
+
+            elif force_segmenter == "yasbd":
+                from yasbd import BoundaryDetector
+                from yasbd import get_supported_langs
+                srxlang_name, srxlang_code = get_language(ending)
+                print(f"Running YASBD segmenter in {srxlang_name}")
+                if srxlang_code in get_supported_langs():
+
+                    detector = BoundaryDetector(lang=srxlang_code, preserve_quote_and_paren=True)
+                else:
+                    detector = BoundaryDetector(lang=srxlang_code, external_lang_packs=[f"yasbd_{srxlang_code}"])
 
         print(f"Segmenting files in {srxlang_name.capitalize()}")
 
@@ -302,7 +313,12 @@ def segment_corpus(args):
                         # process file here
                         for linia in entrada:
                             if force_segmenter:
-                                segments = external_segmenter(nlp, linia, force_segmenter_name.lower())
+                                if force_segmenter == "stanza":
+                                    segments = external_segmenter(nlp, linia, force_segmenter.lower())
+
+                                elif force_segmenter == "yasbd":
+                                    segments = list(detector.segment(linia))
+
                             else:
                                 segments = segmenta(linia, srxfile, srxlang_name.capitalize())
 
@@ -315,7 +331,6 @@ def segment_corpus(args):
                                 else:
                                     sortida.write("\n".join(segments) + "\n")
 
-        # jsonl files test
         if chunk:
             print("\nChunking corpus")
             chunks_folder = indir.parent / f"chunks-{srxlang_code}"
@@ -345,7 +360,7 @@ def segment_corpus(args):
                                 continue
 
                             if force_segmenter:
-                                segments = external_segmenter(nlp, text, force_segmenter_name.lower())
+                                segments = external_segmenter(nlp, text, force_segmenter.lower())
                             else:
                                 segments = segmenta(text, srxfile, srxlang_name.capitalize())
 
